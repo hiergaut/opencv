@@ -34,12 +34,12 @@ def threshold_byFirstWhite(img):
     # img = cv2.GaussianBlur(img, (21, 21), 0)
     # img = cv2.GaussianBlur(img, (21, 21), 0)
     # img = cv2.medianBlur(img, 21)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # img = cv2.equalizeHist(img)
 
-    # return fun.hist(img)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
     hist = cv2.calcHist([img], [0], None, [256], [0, 256])
-    # prev = hist[255]
+
+    # search max value on histogram
     M = hist[0]
     i = 0
     for j in range(1, 256):
@@ -47,15 +47,13 @@ def threshold_byFirstWhite(img):
         if cur > M:
             M = cur
             i = j
-        # if prev > hist[j] > 2000:
-            # break
-        # prev = hist[j]
 
     if i > 253:
         prev = hist[i]
     else:
         prev = hist[i] + hist[i + 1] + hist[i + 2]
 
+    # search first croissant on the right
     for j in range(i + 15, 254):
         cur = hist[j] + hist[j + 1] + hist[j + 2]
         if cur >= prev:
@@ -69,6 +67,7 @@ def threshold_byFirstWhite(img):
     else:
         prev = hist[i - 2] + hist[i - 1] + hist[i]
 
+    # search first croissant on the left
     for j in range(i - 15, 2, -1):
         cur = hist[j - 2] + hist[j - 1] + hist[j]
         if cur >= prev:
@@ -76,6 +75,7 @@ def threshold_byFirstWhite(img):
         prev = cur
 
     left = j
+
     # m = prev
     # pos = j - 50
     # for i in range(j - 1, j - 50, -1):
